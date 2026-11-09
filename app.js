@@ -2,13 +2,13 @@
 (function () {
   'use strict';
 
-  var CSE_VERSION = 'v1.00.00';
+  var CSE_VERSION = 'v1.00.01';
   var GEMINI_MODEL = 'gemini-3.1-flash-lite';
   var STORE = 'cseready-v1';
   var B = window.CSEBank;
 
   /* ---------- storage ---------- */
-  var defaults = { level: null, theme: 'auto', key: '', history: [], areaStats: {}, topicStats: {}, mistakes: [], days: [], answered: 0, correct: 0 };
+  var defaults = { showCorrect: true, level: null, theme: 'auto', key: '', history: [], areaStats: {}, topicStats: {}, mistakes: [], days: [], answered: 0, correct: 0 };
   var S = load();
   function load() {
     try { var r = JSON.parse(localStorage.getItem(STORE)); if (r && typeof r === 'object') return Object.assign({}, defaults, r); } catch (e) {}
@@ -120,12 +120,14 @@
       b.onclick = function () { practiceCfg.source = b.dataset.source; renderPractice(); };
     });
     $('practiceTimed').checked = practiceCfg.timed;
+    $('practiceShowCorrect').checked = S.showCorrect;
     var note = $('aiNote');
     if (practiceCfg.source === 'ai') {
       note.hidden = false;
       note.textContent = S.key ? 'AI will write fresh ' + (practiceCfg.area === 'mixed' ? 'mixed' : B.AREAS[practiceCfg.area].label) + ' questions in the CSE style. Check important facts against official sources.' : 'AI generate needs your free Gemini API key. Add it in Profile.';
     } else note.hidden = true;
   }
+  $('practiceShowCorrect').onchange = function () { S.showCorrect = this.checked; save(); };
   $('practiceTimed').onchange = function () { practiceCfg.timed = this.checked; };
   $('startPractice').onclick = function () {
     var L = lvl(), n = practiceCfg.count, area = practiceCfg.area;
@@ -266,7 +268,11 @@
     var locked = practice && answered;
     $('quizChoices').innerHTML = q.choices.map(function (c, i) {
       var cls = 'choice';
-      if (locked) { if (i === q.a) cls += ' right'; else if (i === quiz.ans[quiz.idx]) cls += ' wrong'; }
+      if (locked) {
+        var pickedRight = quiz.ans[quiz.idx] === q.a;
+        if (i === quiz.ans[quiz.idx]) cls += pickedRight ? ' right' : ' wrong';
+        else if (i === q.a && S.showCorrect) cls += ' right';
+      }
       else if (quiz.ans[quiz.idx] === i) cls += ' sel';
       return '<button type="button" class="' + cls + '" data-i="' + i + '"' + (locked ? ' disabled' : '') + '><span class="k">' + 'ABCD'[i] + '</span><span>' + esc(c) + '</span></button>';
     }).join('');
@@ -275,7 +281,9 @@
     if (locked) {
       var ok = quiz.ans[quiz.idx] === q.a;
       fb.hidden = false;
-      fb.innerHTML = '<b class="' + (ok ? 'ok' : 'no') + '">' + (ok ? 'Correct!' : 'Not quite. Answer: ' + 'ABCD'[q.a]) + '</b><br>' + esc(q.exp || '');
+      if (ok) fb.innerHTML = '<b class="ok">Correct!</b><br>' + esc(q.exp || '');
+      else if (S.showCorrect) fb.innerHTML = '<b class="no">Not quite. Answer: ' + 'ABCD'[q.a] + '</b><br>' + esc(q.exp || '');
+      else fb.innerHTML = '<b class="no">Incorrect.</b> Your answer is locked. The correct answer is shown in the results.';
     } else fb.hidden = true;
     var last = quiz.idx === quiz.qs.length - 1;
     var nb = $('quizNext');

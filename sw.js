@@ -1,5 +1,5 @@
 // Keep in sync with CSE_VERSION in app.js
-const CACHE_NAME = 'cseready-v1.00.00';
+const CACHE_NAME = 'cseready-v1.00.01';
 const CORE_ASSETS = ['./', './index.html', './style.css', './bank.js', './app.js', './manifest.webmanifest', './icons/icon.svg'];
 
 self.addEventListener('install', event => {
