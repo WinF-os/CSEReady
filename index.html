@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1E3A8A">
+<title>CSE Ready</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="shell">
+
+  <header class="topbar">
+    <div class="brand"><img src="icons/icon.svg" alt="" width="28" height="28"><span>CSE Ready</span><small id="versionTag"></small></div>
+    <button id="levelChip" class="chip" type="button" aria-label="Change exam level"></button>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section id="screen-home" class="screen">
+      <div class="hero card">
+        <p class="eyebrow" id="homeLevelDesc"></p>
+        <h1>Pass the Civil Service Exam</h1>
+        <p class="muted">Pass mark is <b>80%</b>. Practice by subtest, take timed mock exams, and review every mistake.</p>
+        <div class="hero-actions">
+          <button class="btn primary" data-go="mock" type="button">Take a Mock Exam</button>
+          <button class="btn ghost" data-go="practice" type="button">Practice</button>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat card"><b id="statStreak">0</b><span>day streak</span></div>
+        <div class="stat card"><b id="statAnswered">0</b><span>answered</span></div>
+        <div class="stat card"><b id="statAccuracy">0%</b><span>accuracy</span></div>
+      </div>
+
+      <h2 class="section-title">Your subtests</h2>
+      <div id="homeAreas" class="area-grid"></div>
+
+      <div id="homeReview" class="card review-cta" hidden>
+        <div><b id="homeReviewCount">0</b> questions to review<br><span class="muted">Redo the ones you missed.</span></div>
+        <button class="btn primary small" id="homeReviewBtn" type="button">Review</button>
+      </div>
+    </section>
+
+    <!-- PRACTICE -->
+    <section id="screen-practice" class="screen" hidden>
+      <h1 class="screen-title">Practice</h1>
+      <div class="card">
+        <label class="field-label">Subtest</label>
+        <div id="practiceAreas" class="seg wrap"></div>
+
+        <label class="field-label">Number of questions</label>
+        <div id="practiceCount" class="seg"></div>
+
+        <label class="field-label">Question source</label>
+        <div id="practiceSource" class="seg">
+          <button type="button" data-source="bank" class="on">Built-in bank</button>
+          <button type="button" data-source="ai">AI generate</button>
+        </div>
+        <p id="aiNote" class="note" hidden></p>
+
+        <label class="toggle"><input type="checkbox" id="practiceTimed"><span>Timed (about 1 minute per question)</span></label>
+
+        <button id="startPractice" class="btn primary block" type="button">Start practice</button>
+      </div>
+    </section>
+
+    <!-- MOCK -->
+    <section id="screen-mock" class="screen" hidden>
+      <h1 class="screen-title">Mock Exam</h1>
+      <div class="card">
+        <p class="muted" id="mockInfo"></p>
+        <div id="mockOptions" class="mock-options"></div>
+        <p class="note">No hints during a mock exam. You can flag items, go back, and see all answers and explanations at the end.</p>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="screen-quiz" class="screen" hidden>
+      <div class="quiz-head">
+        <button id="quizExit" class="icon-btn" type="button" aria-label="Exit quiz">&times;</button>
+        <div class="quiz-progress"><div id="quizBar"></div></div>
+        <div id="quizTimer" class="timer" hidden></div>
+      </div>
+      <p id="quizMeta" class="quiz-meta"></p>
+      <div class="card q-card">
+        <p id="quizQuestion" class="q-text"></p>
+        <div id="quizChoices" class="choices"></div>
+        <div id="quizFeedback" class="feedback" hidden></div>
+      </div>
+      <div class="quiz-actions">
+        <button id="quizPrev" class="btn ghost" type="button">Back</button>
+        <button id="quizFlag" class="btn ghost" type="button">Flag</button>
+        <button id="quizNext" class="btn primary" type="button">Next</button>
+      </div>
+      <div id="quizMap" class="q-map" hidden></div>
+    </section>
+
+    <!-- RESULT -->
+    <section id="screen-result" class="screen" hidden>
+      <div class="card result-card">
+        <div id="resultRing" class="ring"><span id="resultPct">0%</span></div>
+        <h2 id="resultTitle"></h2>
+        <p id="resultSub" class="muted"></p>
+        <div id="resultAreas" class="result-areas"></div>
+        <div class="hero-actions">
+          <button id="resultRetry" class="btn primary" type="button">Try again</button>
+          <button id="resultHome" class="btn ghost" type="button">Home</button>
+        </div>
+      </div>
+      <h2 class="section-title">Review answers</h2>
+      <div class="seg" id="reviewFilter">
+        <button type="button" data-f="all" class="on">All</button>
+        <button type="button" data-f="wrong">Missed</button>
+        <button type="button" data-f="flag">Flagged</button>
+      </div>
+      <div id="resultReview"></div>
+    </section>
+
+    <!-- PROGRESS -->
+    <section id="screen-progress" class="screen" hidden>
+      <h1 class="screen-title">Progress</h1>
+      <div class="card">
+        <h3>Accuracy by subtest</h3>
+        <div id="progressAreas"></div>
+      </div>
+      <div class="card">
+        <h3>Recent sessions</h3>
+        <div id="progressHistory"></div>
+      </div>
+      <div class="card">
+        <h3>Weakest topics</h3>
+        <div id="progressTopics"></div>
+      </div>
+      <div class="card review-cta">
+        <div><b id="reviewCount">0</b> saved mistakes<br><span class="muted">Mistakes are saved so you can redo them.</span></div>
+        <button id="reviewStart" class="btn primary small" type="button">Redo</button>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="screen-profile" class="screen" hidden>
+      <h1 class="screen-title">Profile</h1>
+
+      <div class="card">
+        <h3>Exam level</h3>
+        <div id="profileLevel" class="seg"></div>
+      </div>
+
+      <div class="card">
+        <h3>Appearance</h3>
+        <div id="themeSeg" class="seg">
+          <button type="button" data-theme="auto">Auto</button>
+          <button type="button" data-theme="light">Light</button>
+          <button type="button" data-theme="dark">Dark</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Your Gemini API key</h3>
+        <p class="muted small">Optional. Only needed for <b>AI generate</b>. Get a free key at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>. It stays in this browser and is sent only to Google.</p>
+        <input id="keyInput" class="input" type="password" placeholder="Paste your Gemini API key" autocomplete="off">
+        <div class="hero-actions">
+          <button id="keySave" class="btn primary small" type="button">Save key</button>
+          <button id="keyClear" class="btn ghost small" type="button">Remove</button>
+        </div>
+        <p id="keyStatus" class="note"></p>
+      </div>
+
+      <div class="card">
+        <h3>App updates</h3>
+        <p class="muted small" id="updateStatus">Version <span id="versionText"></span></p>
+        <button id="updateCheck" class="btn ghost small" type="button">Check for updates</button>
+        <button id="updateApply" class="btn primary small" type="button" hidden>Update now</button>
+      </div>
+
+      <div class="card">
+        <h3>Data</h3>
+        <button id="resetData" class="btn danger small" type="button">Reset all progress</button>
+        <p class="note">Everything is stored only on this device.</p>
+      </div>
+
+      <p class="muted small center">CSE Ready is an independent study aid and is not affiliated with the Civil Service Commission. Confirm exam coverage and schedules with the CSC.</p>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Main">
+    <button data-go="home" type="button" class="on"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></button>
+    <button data-go="practice" type="button"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><span>Practice</span></button>
+    <button data-go="mock" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg><span>Mock</span></button>
+    <button data-go="progress" type="button"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg><span>Progress</span></button>
+    <button data-go="profile" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg><span>Profile</span></button>
+  </nav>
+</div>
+
+<!-- level picker on first launch -->
+<div id="levelModal" class="modal" hidden>
+  <div class="modal-box card">
+    <h2>Which exam are you taking?</h2>
+    <p class="muted">You can change this anytime in Profile.</p>
+    <button class="level-btn" data-level="pro" type="button"><b>Professional</b><span>Second-level positions. Verbal, Numerical, Analytical, General Info.</span></button>
+    <button class="level-btn" data-level="sub" type="button"><b>Subprofessional</b><span>First-level positions. Verbal, Numerical, Clerical, General Info.</span></button>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="bank.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

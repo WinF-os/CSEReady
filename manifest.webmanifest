@@ -1,0 +1,14 @@
+{
+  "name": "CSE Ready",
+  "short_name": "CSE Ready",
+  "description": "Civil Service Exam reviewer for the Philippines: practice, mock exams and progress tracking.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4F6FC",
+  "theme_color": "#1E3A8A",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
